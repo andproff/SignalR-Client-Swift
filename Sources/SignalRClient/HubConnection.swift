@@ -469,7 +469,7 @@ fileprivate class HubConnectionConnectionDelegate: ConnectionDelegate {
  A helper class used for retrieving arguments of invocations of client side method.
  */
 public class ArgumentExtractor {
-    let clientInvocationMessage: ClientInvocationMessage
+    public let clientInvocationMessage: ClientInvocationMessage
 
     /**
      Initializes an `ArgumentExtractor` with the received `ClientInvocationMessage`.

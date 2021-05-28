@@ -43,22 +43,25 @@ public class JSONHubProtocol: HubProtocol {
         logger.log(logLevel: .debug, message: "Message received: \(String(data: payload, encoding: .utf8) ?? "(empty)")")
 
         do {
-        let messageType = try getMessageType(payload: payload)
+            var message: HubMessage
+            let messageType = try getMessageType(payload: payload)
             switch messageType {
             case .Invocation:
-                return try decoder.decode(ClientInvocationMessage.self, from: payload)
+                message = try decoder.decode(ClientInvocationMessage.self, from: payload)
             case .StreamItem:
-                return try decoder.decode(StreamItemMessage.self, from: payload)
+                message = try decoder.decode(StreamItemMessage.self, from: payload)
             case .Completion:
-                return try decoder.decode(CompletionMessage.self, from: payload)
+                message = try decoder.decode(CompletionMessage.self, from: payload)
             case .Ping:
-                return PingMessage.instance
+                message = PingMessage.instance
             case .Close:
-                return try decoder.decode(CloseMessage.self, from: payload)
+                message = try decoder.decode(CloseMessage.self, from: payload)
             default:
                 logger.log(logLevel: .error, message: "Unsupported messageType: \(messageType)")
                 throw SignalRError.unknownMessageType
             }
+            message.payload = payload
+            return message
         } catch {
             throw SignalRError.protocolViolation(underlyingError: error)
         }

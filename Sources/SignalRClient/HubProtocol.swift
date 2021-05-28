@@ -33,6 +33,7 @@ public enum MessageType: Int, Codable {
 
 public protocol HubMessage {
     var type: MessageType { get }
+    var payload: Data? { set get }
 }
 
 public class ServerInvocationMessage: HubMessage, Encodable {
@@ -41,6 +42,7 @@ public class ServerInvocationMessage: HubMessage, Encodable {
     public let target: String
     public let arguments: [Encodable]
     public let streamIds: [String]?
+    public var payload: Data?
 
     convenience init(target: String, arguments: [Encodable], streamIds: [String]?) {
         self.init(invocationId: nil, target: target, arguments: arguments, streamIds: streamIds)
@@ -81,6 +83,7 @@ public class ClientInvocationMessage: HubMessage, Decodable {
     public let type = MessageType.Invocation
     public let target: String
     private var arguments: UnkeyedDecodingContainer?
+    public var payload: Data?
 
     public required init (from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -121,6 +124,7 @@ public class StreamItemMessage: HubMessage, Codable {
     public let invocationId: String
     let container: KeyedDecodingContainer<StreamItemMessage.CodingKeys>?
     let item: Encodable?
+    public var payload: Data?
 
     public required init (from decoder: Decoder) throws {
         container = try decoder.container(keyedBy: CodingKeys.self)
@@ -169,6 +173,7 @@ public class CompletionMessage: HubMessage, Codable {
     public let error: String?
     public let hasResult: Bool
     let container: KeyedDecodingContainer<CompletionMessage.CodingKeys>?
+    public var payload: Data?
 
     public required init (from decoder: Decoder) throws {
         container = try decoder.container(keyedBy: CodingKeys.self)
@@ -223,6 +228,7 @@ public class StreamInvocationMessage: HubMessage, Encodable {
     public let target: String
     public let arguments: [Encodable]
     public let streamIds: [String]?
+    public var payload: Data?
 
     init(invocationId: String, target: String, arguments: [Encodable], streamIds: [String]?) {
         self.invocationId = invocationId
@@ -257,6 +263,7 @@ public class StreamInvocationMessage: HubMessage, Encodable {
 public class CancelInvocationMessage: HubMessage, Encodable {
     public let type = MessageType.CancelInvocation
     public let invocationId: String
+    public var payload: Data?
 
     init(invocationId: String) {
         self.invocationId = invocationId
@@ -266,6 +273,7 @@ public class CancelInvocationMessage: HubMessage, Encodable {
 public class PingMessage : HubMessage {
     public let type = MessageType.Ping
     private init() { }
+    public var payload: Data?
 
     static let instance = PingMessage()
 }
@@ -273,6 +281,7 @@ public class PingMessage : HubMessage {
 public class CloseMessage: HubMessage, Decodable {
     public private(set) var type = MessageType.Close
     public let error: String?
+    public var payload: Data?
 
     init(error: String?) {
         self.error = error
